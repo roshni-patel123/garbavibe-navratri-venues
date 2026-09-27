@@ -26,9 +26,10 @@ import { InteractiveMap } from './components/InteractiveMap';
 import { FeaturedArtistsSection } from './components/FeaturedArtistsSection';
 import { BookingModal } from './components/BookingModal';
 import { GroundScheduleMatrix } from './components/GroundScheduleMatrix';
+import { BookingPage } from './components/BookingPage';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'explore' | 'map' | 'singers' | 'schedule'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'book' | 'map' | 'singers' | 'schedule'>('explore');
   const [selectedCity, setSelectedCity] = useState<string>('All');
   const [selectedAuspiciousDay, setSelectedAuspiciousDay] = useState<number | 'all'>('all');
   const [selectedMusicStyle, setSelectedMusicStyle] = useState<string>('All');
@@ -255,6 +256,18 @@ export default function App() {
             </button>
             <button
               type="button"
+              onClick={() => setActiveTab('book')}
+              className={`px-3.5 py-1.5 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 ${
+                activeTab === 'book'
+                  ? 'bg-[#f59e0b] text-[#472a00] shadow-[0_0_15px_rgba(245,158,11,0.35)]'
+                  : 'text-[#ffc174] hover:bg-[#f59e0b]/15 border border-[#ffc174]/30'
+              }`}
+            >
+              <Ticket className="w-3.5 h-3.5" />
+              <span>Book Passes</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('map')}
               className={`px-4 py-2 text-xs font-semibold rounded-full transition-all ${
                 activeTab === 'map'
@@ -388,6 +401,27 @@ export default function App() {
               </span>
               <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#001f26] text-[#54ddfc]">
                 ZERO FEE
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('book');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between transition-all ${
+                activeTab === 'book'
+                  ? 'bg-[#f59e0b] text-[#472a00]'
+                  : 'text-[#ffc174] hover:bg-[#201d32] border border-[#f59e0b]/20'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Ticket className="w-4 h-4" />
+                <span>Book Passes (Name, Mobile &amp; Qty)</span>
+              </span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#f59e0b]/20 text-[#ffc174]">
+                INSTANT
               </span>
             </button>
 
@@ -693,6 +727,19 @@ export default function App() {
               </div>
             </section>
           </>
+        )}
+
+        {/* BOOK PASSES PAGE VIEW */}
+        {activeTab === 'book' && (
+          <BookingPage
+            venues={filteredVenues.length > 0 ? filteredVenues : VENUES_DATA}
+            selectedVenue={bookingVenue || selectedVenueForMap || VENUES_DATA[0]}
+            onSelectVenue={(venue) => {
+              setBookingVenue(venue);
+              setSelectedVenueForMap(venue);
+            }}
+            onNavigateToMap={handleSelectVenueForMap}
+          />
         )}
 
         {/* MAP & PARKING VIEW */}
