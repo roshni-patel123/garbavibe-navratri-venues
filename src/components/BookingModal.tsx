@@ -40,6 +40,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ venue, onClose }) =>
   };
 
   const getPassPrice = () => {
+    if (venue.isFreePass || venue.tickets.isFree) return 0;
     if (selectedPassType === 'female') return venue.tickets.femalePrice || venue.tickets.regularPrice || 800;
     if (selectedPassType === 'male') return venue.tickets.malePrice || venue.tickets.regularPrice || 1200;
     if (selectedPassType === 'couple') return venue.tickets.couplePrice || 1800;

@@ -48,15 +48,17 @@ export const VenueCard: React.FC<VenueCardProps> = ({
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           <span
             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shadow-md ${
-              venue.badge.type === 'hot'
-                ? 'bg-[#cc003c] text-white shadow-[#cc003c]/40'
-                : venue.badge.type === 'record'
-                  ? 'bg-[#f59e0b]/90 text-[#141125] font-extrabold'
-                  : venue.badge.type === 'exclusive'
-                    ? 'bg-[#353248]/90 text-[#ffddb8]'
-                    : venue.badge.type === 'ac'
-                      ? 'bg-[#29c1df]/80 text-[#001f26] font-extrabold'
-                      : 'bg-[#cc003c]/80 text-white'
+              venue.badge.type === 'free' || venue.isFreePass
+                ? 'bg-[#29c1df] text-[#001f26] font-extrabold shadow-[0_0_14px_rgba(41,193,223,0.6)]'
+                : venue.badge.type === 'hot'
+                  ? 'bg-[#cc003c] text-white shadow-[#cc003c]/40'
+                  : venue.badge.type === 'record'
+                    ? 'bg-[#f59e0b]/90 text-[#141125] font-extrabold'
+                    : venue.badge.type === 'exclusive'
+                      ? 'bg-[#353248]/90 text-[#ffddb8]'
+                      : venue.badge.type === 'ac'
+                        ? 'bg-[#29c1df]/80 text-[#001f26] font-extrabold'
+                        : 'bg-[#cc003c]/80 text-white'
             }`}
           >
             {venue.badge.text}
@@ -148,7 +150,16 @@ export const VenueCard: React.FC<VenueCardProps> = ({
           <div className="flex items-baseline justify-between">
             <span className="text-xs text-[#a08e7a]">Pass Pricing</span>
             <div className="text-right">
-              {venue.tickets.label ? (
+              {venue.isFreePass || venue.tickets.isFree ? (
+                <div className="flex items-center gap-1.5 justify-end">
+                  <span className="bg-[#29c1df]/20 text-[#54ddfc] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#54ddfc]/30">
+                    100% FREE
+                  </span>
+                  <span className="text-base font-extrabold text-[#54ddfc]">
+                    Free Entry
+                  </span>
+                </div>
+              ) : venue.tickets.label ? (
                 <span className="text-base font-bold text-[#e5dffb]">
                   {venue.tickets.label}
                 </span>
@@ -173,10 +184,16 @@ export const VenueCard: React.FC<VenueCardProps> = ({
             <button
               type="button"
               onClick={() => onOpenBookingModal(venue)}
-              className="flex items-center justify-center gap-1.5 bg-[#f59e0b] hover:bg-[#ffb95f] text-[#472a00] text-xs font-bold py-2.5 px-2 rounded-xl shadow-md transition-all group-hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+              className={`flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 px-2 rounded-xl shadow-md transition-all ${
+                venue.isFreePass || venue.tickets.isFree
+                  ? 'bg-[#29c1df] hover:bg-[#54ddfc] text-[#001f26] shadow-[0_0_12px_rgba(41,193,223,0.4)]'
+                  : 'bg-[#f59e0b] hover:bg-[#ffb95f] text-[#472a00] group-hover:shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+              }`}
             >
               <Ticket className="w-3.5 h-3.5" />
-              <span className="truncate">Book on {venue.ticketingPlatform}</span>
+              <span className="truncate">
+                {venue.isFreePass ? 'Claim Free Pass' : `Book on ${venue.ticketingPlatform}`}
+              </span>
             </button>
           </div>
         </div>

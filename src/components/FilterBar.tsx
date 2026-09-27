@@ -20,6 +20,7 @@ interface FilterProps {
   selectedVenueType: string;
   onSelectVenueType: (type: string) => void;
   quickFilters: {
+    freePassesOnly: boolean;
     freeParking: boolean;
     valetAvailable: boolean;
     adityaGadhvi: boolean;
@@ -227,6 +228,27 @@ export const FilterBar: React.FC<FilterProps> = ({
           <span className="text-[11px] font-semibold text-[#a08e7a] uppercase whitespace-nowrap mr-1 tracking-wider">
             Quick Filters:
           </span>
+
+          <button
+            type="button"
+            onClick={() => onToggleQuickFilter('freePassesOnly')}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
+              quickFilters.freePassesOnly
+                ? 'bg-[#54ddfc] text-[#001f26] border-white shadow-[0_0_18px_rgba(84,221,252,0.6)] scale-105'
+                : 'bg-[#54ddfc]/20 text-[#54ddfc] border-[#54ddfc]/40 hover:bg-[#54ddfc]/30'
+            }`}
+          >
+            <span>🎟️ Free Passes (Zero Fee)</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                quickFilters.freePassesOnly
+                  ? 'bg-[#001f26] text-[#54ddfc]'
+                  : 'bg-[#54ddfc]/30 text-[#e5dffb]'
+              }`}
+            >
+              FREE
+            </span>
+          </button>
 
           <button
             type="button"

@@ -19,8 +19,9 @@ export interface TicketBreakdown {
   couplePrice?: number;
   seasonPrice?: number;
   regularPrice?: number;
+  isFree?: boolean;
   currency: string;
-  label: string; // e.g., "From ₹800 (F) / ₹1,200 (M)"
+  label: string; // e.g., "From ₹800 (F) / ₹1,200 (M)" or "100% Free Entry"
   fastFilling?: boolean;
   statusBadge?: string;
 }
@@ -61,8 +62,9 @@ export interface VenueEvent {
   auspiciousDays: number[]; // e.g. [1, 2, 3, 4, 5, 6, 7, 8, 9]
   badge: {
     text: string;
-    type: 'hot' | 'record' | 'exclusive' | 'ac' | 'traditional';
+    type: 'hot' | 'record' | 'exclusive' | 'ac' | 'traditional' | 'free';
   };
+  isFreePass?: boolean;
   headliner: HeadlinerArtist;
   parking: ParkingInfo;
   tickets: TicketBreakdown;

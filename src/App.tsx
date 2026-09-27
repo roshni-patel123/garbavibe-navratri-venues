@@ -14,6 +14,9 @@ import {
   Flame,
   CheckCircle,
   Share2,
+  Ticket,
+  Menu,
+  X,
 } from 'lucide-react';
 import { VENUES_DATA, ARTISTS_DATA, SCHEDULE_DATA } from './data/garbaData';
 import { VenueEvent, ArtistProfile } from './types/garba';
@@ -31,9 +34,11 @@ export default function App() {
   const [selectedMusicStyle, setSelectedMusicStyle] = useState<string>('All');
   const [selectedVenueType, setSelectedVenueType] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'trending' | 'parking' | 'distance' | 'price'>('trending');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Quick Filters state
   const [quickFilters, setQuickFilters] = useState({
+    freePassesOnly: false,
     freeParking: false,
     valetAvailable: false,
     adityaGadhvi: false,
@@ -84,6 +89,14 @@ export default function App() {
     }
 
     // Quick filters
+    if (
+      quickFilters.freePassesOnly &&
+      !v.isFreePass &&
+      !v.tickets.isFree &&
+      (v.tickets.regularPrice || 0) > 0
+    ) {
+      return false;
+    }
     if (quickFilters.freeParking && v.parking.priceType !== 'FREE') return false;
     if (quickFilters.valetAvailable && !v.parking.valetAvailable) return false;
     if (
@@ -205,14 +218,40 @@ export default function App() {
           <nav className="hidden lg:flex items-center gap-1">
             <button
               type="button"
-              onClick={() => setActiveTab('explore')}
+              onClick={() => {
+                setActiveTab('explore');
+                setQuickFilters((prev) => ({ ...prev, freePassesOnly: false }));
+              }}
               className={`px-4 py-2 text-xs font-semibold rounded-full transition-all ${
-                activeTab === 'explore'
+                activeTab === 'explore' && !quickFilters.freePassesOnly
                   ? 'bg-[#353248] text-[#ffc174] shadow-[0_0_12px_rgba(245,158,11,0.2)]'
                   : 'text-[#d8c3ad] hover:text-[#e5dffb]'
               }`}
             >
               Explore Venues
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('explore');
+                setQuickFilters((prev) => ({ ...prev, freePassesOnly: !prev.freePassesOnly }));
+              }}
+              className={`px-3.5 py-1.5 text-xs font-bold rounded-full transition-all flex items-center gap-1.5 ${
+                quickFilters.freePassesOnly && activeTab === 'explore'
+                  ? 'bg-[#29c1df] text-[#001f26] shadow-[0_0_12px_rgba(41,193,223,0.5)]'
+                  : 'bg-[#29c1df]/15 text-[#54ddfc] hover:bg-[#29c1df]/25 border border-[#54ddfc]/30'
+              }`}
+            >
+              <span>🎟️ Free Passes</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                  quickFilters.freePassesOnly
+                    ? 'bg-[#001f26] text-[#54ddfc]'
+                    : 'bg-[#54ddfc]/20 text-[#54ddfc]'
+                }`}
+              >
+                FREE
+              </span>
             </button>
             <button
               type="button"
@@ -297,9 +336,129 @@ export default function App() {
                   />
                 </div>
               </div>
+
+              {/* Mobile Hamburger Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 rounded-xl bg-[#201d32] border border-white/5 text-[#e5dffb] hover:text-[#ffc174] transition-colors ml-1"
+                aria-label="Toggle navigation menu"
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-[#16122e]/98 backdrop-blur-2xl border-b border-white/10 px-4 py-4 flex flex-col gap-2.5">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('explore');
+                setQuickFilters((prev) => ({ ...prev, freePassesOnly: false }));
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTab === 'explore' && !quickFilters.freePassesOnly
+                  ? 'bg-[#353248] text-[#ffc174]'
+                  : 'text-[#d8c3ad] hover:bg-[#201d32]'
+              }`}
+            >
+              Explore Venues
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('explore');
+                setQuickFilters((prev) => ({ ...prev, freePassesOnly: true }));
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-between transition-all ${
+                quickFilters.freePassesOnly
+                  ? 'bg-[#29c1df] text-[#001f26]'
+                  : 'bg-[#29c1df]/15 text-[#54ddfc] border border-[#54ddfc]/30'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Ticket className="w-4 h-4" />
+                <span>Free Passes (100% Free Entry)</span>
+              </span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#001f26] text-[#54ddfc]">
+                ZERO FEE
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('map');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTab === 'map'
+                  ? 'bg-[#353248] text-[#ffc174]'
+                  : 'text-[#d8c3ad] hover:bg-[#201d32]'
+              }`}
+            >
+              Interactive Map &amp; Parking Radar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('singers');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTab === 'singers'
+                  ? 'bg-[#353248] text-[#ffc174]'
+                  : 'text-[#d8c3ad] hover:bg-[#201d32]'
+              }`}
+            >
+              Singers &amp; Lineup
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('schedule');
+                setIsMobileMenuOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                activeTab === 'schedule'
+                  ? 'bg-[#353248] text-[#ffc174]'
+                  : 'text-[#d8c3ad] hover:bg-[#201d32]'
+              }`}
+            >
+              Pass Guide &amp; Master Schedule
+            </button>
+
+            {/* Mobile City Selector */}
+            <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-[#a08e7a]">
+              <span>Filter City:</span>
+              <div className="flex items-center gap-1 overflow-x-auto">
+                {['All', 'Ahmedabad', 'Surat', 'Vadodara', 'Mumbai'].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCity(c);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`px-2 py-1 rounded-md text-[11px] font-bold ${
+                      selectedCity === c ? 'bg-[#ffc174] text-[#472a00]' : 'text-[#d8c3ad]'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Main Content Body */}
@@ -395,13 +554,27 @@ export default function App() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f59e0b] opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3 w-3 bg-[#f59e0b]"></span>
                   </span>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex items-baseline gap-2 flex-wrap">
                     <h2 className="text-base font-bold text-[#e5dffb]">
-                      {filteredVenues.length} Verified Garba Venues Found
+                      {filteredVenues.length} {quickFilters.freePassesOnly ? 'Free Pass' : 'Verified'} Garba Venues Found
                     </h2>
-                    <span className="hidden md:inline text-xs text-[#a08e7a]">
-                      in {selectedCity === 'All' ? 'Gujarat & Mumbai Metropolitan Area' : selectedCity}
-                    </span>
+                    {quickFilters.freePassesOnly ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#29c1df]/20 text-[#54ddfc] text-xs font-bold border border-[#54ddfc]/40">
+                        <span>🎟️ 100% Free Passes Only</span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleQuickFilter('freePassesOnly')}
+                          className="hover:text-white font-black cursor-pointer ml-1"
+                          title="Clear Free Passes Filter"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="hidden md:inline text-xs text-[#a08e7a]">
+                        in {selectedCity === 'All' ? 'Gujarat & Mumbai Metropolitan Area' : selectedCity}
+                      </span>
+                    )}
                   </div>
                 </div>
 
